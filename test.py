@@ -17,10 +17,12 @@ import collections
 # TODO zrobic inteligentniejszego swap-a - to jest trudniejsze zadanie
 
 # ALGORYTM
-# 1. Ustaw calkiem losowa trase -> tasae wyznaczana jest na podstawie kolejnosc tablicy cities
+# 1. Ustaw tablice  najkrotszych sciezek pomiedzy miastami z przesylka, po drodze uwzglednij trasy przez mista bez przesylki
+# 1. Ustaw calkiem losowa kolejnosc odwiedzania mista z przesylkami -> tasae wyznaczana jest na podstawie kolejnosc tablicy cities
+# 3. Najkrotsza trase pomiedzy wczesniej wylosowanymi nodami n, a n+1 wez z tablicy najkrotszych sciezek
 # 3. licz trase po koleji z wezla n do wezla n+1, gdy bak przekroczy tank treshold, dodaj dystans z obecnego city->najblizszej stacji i z stacji->next hopa, zapisz wspolzedne wybranej stacji do gasStations_dict
 # 4. jezeli trasa jest krotsza od ostatnie najlepszej, ustaw ja jako najbardziej optymalna razem z wpisanymi dla tej trasy stacjami
-# 5. zrob swapa na dwoch losowych wezlach
+# 5. zrob swapa na dwoch losowych wezlach misat z przesylka
 # 6. przejdz do 3, jezeli temperatura powyzej tresholdu
 
 startTime = datetime.now()
@@ -96,22 +98,38 @@ def add_gasStation(new_tour, city1, city2, gasStations_dict):
     return new_tour, tank, gasStations_dict
 
 
-def count_distance(tour, zlamane_iteracje, dis):
+def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
     # TODO liczenie dystansow tylko dla wybranych polaczen
     tank = 180
     tank_treshold = 120
     count_sum = True
     new_tour = 0
     # print "count distance cities ", cities
-
+    # print PATHS_DICT
     cities1 = cities[:]
     gasStations_dict = {}
+    MAIN_PATH = []
+    route = []
+    for d  in xrange(len(designated_cities)):
+        if d == len(designated_cities)-1:
+            temp_path = designated_cities[-1], designated_cities[0]
+        else:
+            temp_path = designated_cities[d], designated_cities[d+1]
+        route.append(temp_path)
+    for h in route:
+        print h[0], h[1]
+        print "TEST--", PATHS_DICT[h[0]][h[1]]
+        MAIN_PATH.append(PATHS_DICT[h[0]][h[1]])
+        MAIN_PATH.append(h[1])
+    print MAIN_PATH
+    time.sleep(30)
+    # print "reoue ", route
+
 
     for i in range(cities_no):
 
         if i == cities_no - 1:
-            dis.append(
-                round(math.sqrt((cities1[i][0] - cities1[0][0]) ** 2 + ((cities1[i][1] - cities1[0][1]) ** 2)), 2))
+            dis.append( round(math.sqrt((cities1[i][0] - cities1[0][0]) ** 2 + ((cities1[i][1] - cities1[0][1]) ** 2)), 2))
             # print "trasa od city", i, "do city startowego"
         else:
             dis.append(
@@ -165,6 +183,7 @@ def create_route_table(PATHS, org_cities_tuples, node):
 def modified_dijkstra():
     global main_temp_checked_cities
     org_cities_tuples = []
+    PATHS_DICT = {}
 
 
     for i in original_cities:
@@ -191,9 +210,9 @@ def modified_dijkstra():
         print "node  root  to: ", node, "ze wspolrzednymi: ", org_cities_tuples[node],"\n\n"
         not_checked_cities = org_cities_tuples[:]
         k = 0
-        PATHS = collections.OrderedDict()
+        PATHS = {}
         while len(not_checked_cities):
-            print "-------------------------------------------------------------#####################----------------------------------------------------------"
+            # print "-------------------------------------------------------------#####################----------------------------------------------------------"
             temp_checked_cities = main_temp_checked_cities[:]
             temp = []
             dis_vector = {}
@@ -214,8 +233,8 @@ def modified_dijkstra():
                         PATHS[i] = org_cities_tuples[node]
                 main_temp_checked_cities = temp1_checked_cities
                 k = 1
-                time.sleep(5)
-            print "SCIEZKA !!!!", PATHS
+                # time.sleep(5)
+            # print "SCIEZKA !!!!", PATHS
 
 
 
@@ -234,17 +253,17 @@ def modified_dijkstra():
                         temp = tuple(original_cities[i])
                         check_if = True
                         value = round(math.sqrt((temp[1] - x[1]) ** 2 + ((temp[0] - x[0]) ** 2)), 2)
-                        try:
-                            print "nowa wartosc ", value, "stara wartosc  ", dis_vector[i]
-                        except Exception as e:
-                            pass
+                        # try:
+                        #     print "nowa wartosc ", value, "stara wartosc  ", dis_vector[i]
+                        # except Exception as e:
+                        #     pass
                         if not (dis_vector.has_key(i)) or value < dis_vector[i]:  # jezeli nie dbylo wpisu dla takiego wezla lub obecna wartosc jest mniejsza od ostatniej wpisanej
                             dis_vector[i] = value
-                            print "\nPATHS  od ", i, "wynosi ", x
+                            # print "\nPATHS  od ", i, "wynosi ", x
                             PATHS[i] = x
                     if temp not in temp1_checked_cities and check_if:
                         temp1_checked_cities.append(temp)
-                        print "\ntemp1 czyli sasiedzi dla wezlow z danej iteracji while'a", temp1_checked_cities
+            # print "\ntemp1 czyli sasiedzi dla wezlow z danej iteracji while'a", temp1_checked_cities
 
             print "odleglosci  do odkrytych sasiadow", dis_vector
             print "odkryci sasiedzi do przekazania do kolejnej iteracji whila ", temp1_checked_cities
@@ -254,6 +273,11 @@ def modified_dijkstra():
 
             main_temp_checked_cities = temp1_checked_cities[:]
         PATHS = create_route_table(PATHS, org_cities_tuples, node)
+        PATHS_DICT[node] = PATHS
+    print  PATHS_DICT
+    # time.sleep(30)
+    return PATHS_DICT
+
 
     # time.sleep(30)
 
@@ -266,7 +290,8 @@ def main():
     checkPoint = 0
     cooling_rate = 0.003
     best_cities = []
-    modified_dijkstra()
+    PATHS_DICT = modified_dijkstra()
+    print "-------------------------------------------------------------#####################----------------------------------------------------------"
 
     # glowna petla szukajaca optymalnej trasy
     while (temperature > 10):
@@ -277,7 +302,7 @@ def main():
         # TODO akceptacja trasy ktora spelnia wymaganai tablicy sasiedztw
         # random.shuffle(cities)          #ustatwie nowa, calkowicie losowa trase
 
-        count_sum, zlamane_iteracje, new_tour, stations = count_distance(tour, zlamane_iteracje, dis)
+        count_sum, zlamane_iteracje, new_tour, stations = count_distance(tour, zlamane_iteracje, dis, PATHS_DICT)
         # if przypisujacy najlepsze rozwiazania do finalnych zmiennych
         if count_sum:
             sum_dis = sum(dis)
@@ -318,10 +343,13 @@ cities = [[80, 39], [11, 52], [78, 58], [45, 72]]
 cities = [[82, 26], [53, 2], [87, 51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]]  # 10 miast
 # 0, 4, 7, 8
 # designated_cities = [(82, 26), (95, 56),(3, 37), (22, 56)]
-# designated_cities = [0, 4, 7, 8]
-designated_cities = [7]
+designated_cities = [0, 4, 7, 8]
+# designated_cities = [7]
 original_cities = cities[:]
 cities_no = len(cities)
+
+
+
 
 # ----------------------------------------------------
 # -- GAS STATIONS ---
