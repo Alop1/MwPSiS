@@ -1,5 +1,5 @@
 from __future__ import division
-import random,  copy
+import random,  copy, matplotlib.pyplot as plt
 import string, os,  math, time
 from datetime import datetime
 import collections
@@ -133,120 +133,14 @@ def count_distance(tour, zlamane_iteracje, dis):
             # print "zlamana petal"
             break
 
-    # print "\n"
-
     return count_sum, zlamane_iteracje, new_tour, gasStations_dict
 
-def modified_dijkstra():
-    global main_temp_checked_cities
-    org_cities_tuples = []
 
-    checked_cities = []
-    distance_matrix = []
-
-    for i in orgine_cities:
-        org_cities_tuples.append(tuple(i))
-
-    neighbour_tab= {
-    org_cities_tuples[0] : [1,1,1,0,0,0,0,0,0,0],
-    org_cities_tuples[1] : [1,0,0,0,1,0,0,0,0,1],
-    org_cities_tuples[2] : [1,0,1,1,0,0,1,0,0,1],
-    org_cities_tuples[3] : [0,0,1,1,0,1,0,0,0,0],
-    org_cities_tuples[4] : [0,0,0,0,1,1,0,0,1,0],
-    org_cities_tuples[5] : [0,0,0,1,1,1,0,1,0,1],
-    org_cities_tuples[6] : [0,0,1,0,0,0,1,0,0,0],
-    org_cities_tuples[7] : [0,0,0,0,0,1,0,1,1,0],
-    org_cities_tuples[8] : [0,0,0,0,1,0,0,1,1,0],
-    org_cities_tuples[9] : [0,1,1,0,0,1,0,0,0,1]
-    }
-    # print neighbour_tab
-    not_checked_cities = org_cities_tuples[:]
-    tab11 = []
-    j = 0
-    k =0
-    lenght_checked_cities = 0
-
-    temp1_checked_cities = []
-    #_PATHS = collections.OrderedDict()
-    _PATHS = {}
-    while len(not_checked_cities):
-        print "-------------------------------------------------------------#####################----------------------------------------------------------"
-        temp_checked_cities = main_temp_checked_cities[:]
-        temp = []
-        dis_vector = {}
-        temp_dis_vactor = {}
-        if k == 0:      #przejscie zerowe
-            temp_not_checked_cities = []
-            temp1_checked_cities = []
-            for i in xrange(len(neighbour_tab[org_cities_tuples[0]])):
-                condition_2 = tuple(orgine_cities[i]) in not_checked_cities
-                condition_1 = neighbour_tab[org_cities_tuples[0]][i]
-                if  condition_1 and condition_2: #sprawdza czy badane misasto jest sasiadem i czy juz dnie niego nie mamy trasy
-                    temp = tuple(orgine_cities[i])
-
-                    value = round(math.sqrt((temp[1] - org_cities_tuples[0][1])**2 + ((temp[0] - org_cities_tuples[0][0])**2)), 2)
-                    dis_vector[i] = value
-
-
-                    temp1_checked_cities.append(temp)
-                    not_checked_cities.remove(temp)
-                    _PATHS[i] = org_cities_tuples[0]
-                    lenght_checked_cities = len(checked_cities)
-                    # print "not checkee cities ", not_checked_cities, "\n checked cities ", checked_cities
-                    # print "policzono odleglosci do sasiadow, zaktualizowano tablice"
-            temp_checked_cities=temp1_checked_cities
-            k = 1
-        print "SCIEZKA !!!!" , _PATHS
-
-
-        temp1_checked_cities = []
-        print "\nprzeszukujemy zbior z iteracji: ", temp_checked_cities
-        for x in temp_checked_cities:
-
-            print "curent node ", x
-            for i in xrange(len(neighbour_tab[org_cities_tuples[0]])):
-                check_if = False
-                condition_2 = tuple(orgine_cities[i]) in not_checked_cities
-                condition_1 = neighbour_tab[x][i]
-                condition_3 = not (tuple(orgine_cities[i]) == x)
-                # print "cond1", condition_1, "cond2", condition_2, "cond3", condition_3
-                if condition_1 and condition_2 and condition_3: #sprawdza czy badane misasto jest sasiadem i czy juz dnie niego nie mamy trasy
-                    print "nowy sasiad", orgine_cities[i],"z id ",i, "dla wezla ",x
-                    temp = tuple(orgine_cities[i])
-                    check_if = True
-                    value = round(math.sqrt((temp[1] - x[1])**2 + ((temp[0] - x[0])**2)), 2)
-
-                    try:
-                        print "nowa wartosc ", value, "stara wartosc  ", dis_vector[i]
-                    except Exception as e:
-                        pass
-
-                    if not(dis_vector.has_key(i)) or value < dis_vector[i]:    # jezeli nie dbylo wpisu dla takiego wezla lub obecna wartosc jest mniejsza od ostatniej wpisanej
-                        dis_vector[i] = value
-                        print "\nPATHS  od ", i ,"wynosi ", x
-                        _PATHS[i] = x
-                if temp not in temp1_checked_cities and check_if:
-
-                    temp1_checked_cities.append(temp)
-                    print "\ntemp1 czyli sasiedzi dla wezlow z danej iteracji while'a", temp1_checked_cities
-
-                    #time.sleep(1)
-
-            print "odleglosci do odkrytych sasiadow", dis_vector
-
-        print "odkryci sasiedzi do przekazania do kolejnej iteracji whila ", temp1_checked_cities
-        for visited in temp1_checked_cities:
-                not_checked_cities.remove(visited)
-
-        print "nieodwiedzone miasta", not_checked_cities
-        main_temp_checked_cities = temp1_checked_cities[:]
+def create_route_table(_PATHS, org_cities_tuples):
 
     for key in _PATHS:
         _PATHS[key] = [org_cities_tuples.index(_PATHS[key])]
 
-    # cities = []
-    # for k in _PATHS:
-    #     cities.append(_PATHS[k])
     print "POCZATKOWO WSZYSTKIE", _PATHS
     flag = True
     while flag:
@@ -259,59 +153,105 @@ def modified_dijkstra():
                 _PATHS[i] = _PATHS[c] + _PATHS[i]
                 if _PATHS[c][0] == 0:
                     flag = True
-
     print "KONCOWO", _PATHS
-    # for key in _PATHS:
-    #     _PATHS[key] = [org_cities_tuples.index(_PATHS[key])]
-        #time.sleep(1)
-    # print _PATHS
-    # k = 0
-    # j = 0
-    # for key in _PATHS:
-    #     if k == 0:
-    #         k += 1
-    #         continue
-    #     else:
-    #         temp_val = None
-    #         for key2 in _PATHS:
-    #             if key2 == key:
-    #                 break
-    #             temp_val = _PATHS[key2]
-    #         if temp_val:
-    #             #_PATHS[key].append(temp_val)
-    #
-    #             for ii in temp_val:
-    #
-    #                 _PATHS[key].append(ii)
-    #             _PATHS[key].append(_PATHS[key].pop(0))
-    #         #         print "TEST", temp_val
-    #         #         _PATHS[key].append(ii)
-    #         #     print "TEST", temp_val
-    #         #     j += 1
-    #         #     if k == j:
-    #         #         break
-    #         # if len(temp_val) > 0 and len(temp_val) < 10:
-    #         #     for ii in temp_val:
-    #         #         print "TEST", temp_val
-    #         #         _PATHS[key].append(ii)
-    #
-    #         #_PATHS[key].append(temp_val)
-    # print _PATHS
-    # print prev_cities
-    time.sleep(30)
+    return _PATHS
 
 
-    # checked_cities.append(temp_checked_cities)
+def modified_dijkstra():
+    global main_temp_checked_cities
+    org_cities_tuples = []
+
+    checked_cities = []
+    distance_matrix = []
+
+    for i in orginal_cities:
+        org_cities_tuples.append(tuple(i))
+
+    neighbour_tab= {
+    org_cities_tuples[0] : [1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    org_cities_tuples[1] : [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    org_cities_tuples[2] : [1, 0, 1, 1, 0, 0, 1, 0, 0, 1],
+    org_cities_tuples[3] : [0, 0, 1, 1, 0, 1, 0, 0, 0, 0],
+    org_cities_tuples[4] : [0, 0, 0, 0, 1, 1, 0, 0, 1, 0],
+    org_cities_tuples[5] : [0, 0, 0, 1, 1, 1, 0, 1, 0, 1],
+    org_cities_tuples[6] : [0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    org_cities_tuples[7] : [0, 0, 0, 0, 0, 1, 0, 1, 1, 0],
+    org_cities_tuples[8] : [0, 0, 0, 0, 1, 0, 0, 1, 1, 0],
+    org_cities_tuples[9] : [0, 1, 1, 0, 0, 1, 0, 0, 0, 1]
+    }
+    # print neighbour_tab
+    not_checked_cities = org_cities_tuples[:]
+
+    j = 0
+    k =0
+
+    _PATHS = {}
+    while len(not_checked_cities):
+        print "-------------------------------------------------------------#####################----------------------------------------------------------"
+        temp_checked_cities = main_temp_checked_cities[:]
+        temp = []
+        dis_vector = {}
+        if k == 0:      #przejscie zerowe
+            temp_not_checked_cities = []
+            temp1_checked_cities = []
+            for i in xrange(len(neighbour_tab[org_cities_tuples[0]])):
+                condition_2 = tuple(orginal_cities[i]) in not_checked_cities
+                condition_1 = neighbour_tab[org_cities_tuples[0]][i]
+                if condition_1 and condition_2: #sprawdza czy badane misasto jest sasiadem i czy juz dnie niego nie mamy trasy
+                    temp = tuple(orginal_cities[i])
+
+                    value = round(math.sqrt((temp[1] - org_cities_tuples[0][1])**2 + ((temp[0] - org_cities_tuples[0][0])**2)), 2)
+                    dis_vector[i] = value
 
 
+                    temp1_checked_cities.append(temp)
+                    not_checked_cities.remove(temp)
+                    _PATHS[i] = org_cities_tuples[0]
+                    # print "not checkee cities ", not_checked_cities, "\n checked cities ", checked_cities
+                    # print "policzono odleglosci do sasiadow, zaktualizowano tablice"
+            main_temp_checked_cities = temp1_checked_cities
+            k = 1
+        print "SCIEZKA !!!!" , _PATHS
 
-        # print "\n\n"
-        # print "wektor dystansow do z wierzcholka 1 ",org_cities_tuples[0], "do sasiada", temp,"to" ,dis_vector
 
+        temp1_checked_cities = []
+        print "\nprzeszukujemy zbior z iteracji: ", temp_checked_cities
+        for x in main_temp_checked_cities:
 
+            print "curent node ", x
+            for i in xrange(len(neighbour_tab[org_cities_tuples[0]])):
+                check_if = False
+                condition_2 = tuple(orginal_cities[i]) in not_checked_cities
+                condition_1 = neighbour_tab[x][i]
+                condition_3 = not (tuple(orginal_cities[i]) == x)
+                # print "cond1", condition_1, "cond2", condition_2, "cond3", condition_3
+                if condition_1 and condition_2 and condition_3: #sprawdza czy badane misasto jest sasiadem i czy juz dnie niego nie mamy trasy
+                    print "nowy sasiad", orginal_cities[i],"z id ",i, "dla wezla ",x
+                    temp = tuple(orginal_cities[i])
+                    check_if = True
+                    value = round(math.sqrt((temp[1] - x[1])**2 + ((temp[0] - x[0])**2)), 2)
+                    try:
+                        print "nowa wartosc ", value, "stara wartosc  ", dis_vector[i]
+                    except Exception as e:
+                        pass
+                    if not(dis_vector.has_key(i)) or value < dis_vector[i]:    # jezeli nie dbylo wpisu dla takiego wezla lub obecna wartosc jest mniejsza od ostatniej wpisanej
+                        dis_vector[i] = value
+                        print "\nPATHS  od ", i ,"wynosi ", x
+                        _PATHS[i] = x
+                if temp not in temp1_checked_cities and check_if:
+                    temp1_checked_cities.append(temp)
+                    print "\ntemp1 czyli sasiedzi dla wezlow z danej iteracji while'a", temp1_checked_cities
 
+            print "odleglosci do odkrytych sasiadow", dis_vector
+        print "odkryci sasiedzi do przekazania do kolejnej iteracji whila ", temp1_checked_cities
+        for visited in temp1_checked_cities:
+                not_checked_cities.remove(visited)
+        print "nieodwiedzone miasta", not_checked_cities
 
-    time.sleep(30)
+        main_temp_checked_cities = temp1_checked_cities[:]
+    _PATHS = create_route_table(_PATHS,org_cities_tuples)
+
+    # time.sleep(30)
 
 
 
@@ -376,11 +316,11 @@ main_temp_checked_cities = []
 cities = [[80, 39], [11, 52], [78, 58],[45,72]]
 # cities = [[16, 50], [62, 91],  [43, 8], [11, 71], [34, 31],[23,89],[76,42],[76,90]] #8
 neighbour_tab= [[1,0,1,1], [0,1,1,0],[1,1,1,1],[1,0,0,1]]
-# TODO slownik mapujacy wspolzedne na swoja przypisane do nich sasiedztwa
+# TODO slownik mapujacy wspolzedne na swoja przypisane do nich sasiedztwa- done
 
 # dest_cities =[[82, 26], [53, 2], [87, 51], [54, 70], [3, 37]]
 cities = [[82, 26], [53, 2], [87,51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]] # 10 miast
-orgine_cities = cities[:]
+orginal_cities = cities[:]
 cities_no = len(cities)
 
 # ----------------------------------------------------
