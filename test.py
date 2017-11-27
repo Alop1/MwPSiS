@@ -1,5 +1,5 @@
 from __future__ import division
-import random,  copy, matplotlib.pyplot as plt
+import random,  copy
 import string, os,  math, time
 from datetime import datetime
 import collections
@@ -194,14 +194,14 @@ def modified_dijkstra():
                     lenght_checked_cities = len(checked_cities)
                     # print "not checkee cities ", not_checked_cities, "\n checked cities ", checked_cities
                     # print "policzono odleglosci do sasiadow, zaktualizowano tablice"
-            main_temp_checked_cities = temp1_checked_cities
+            temp_checked_cities=temp1_checked_cities
             k = 1
         print "SCIEZKA !!!!" , _PATHS
 
 
         temp1_checked_cities = []
         print "\nprzeszukujemy zbior z iteracji: ", temp_checked_cities
-        for x in main_temp_checked_cities:
+        for x in temp_checked_cities:
 
             print "curent node ", x
             for i in xrange(len(neighbour_tab[org_cities_tuples[0]])):
@@ -241,43 +241,63 @@ def modified_dijkstra():
         print "nieodwiedzone miasta", not_checked_cities
         main_temp_checked_cities = temp1_checked_cities[:]
 
-
     for key in _PATHS:
         _PATHS[key] = [org_cities_tuples.index(_PATHS[key])]
+
+    # cities = []
+    # for k in _PATHS:
+    #     cities.append(_PATHS[k])
+    print "POCZATKOWO WSZYSTKIE", _PATHS
+    flag = True
+    while flag:
+        flag = False
+        for i in range (len(_PATHS)):
+            c = _PATHS[i][0]
+            #print "POPRZEDNIE MIASTO", c
+            if c != 0:
+                #print "JEDZIEM"
+                _PATHS[i] = _PATHS[c] + _PATHS[i]
+                if _PATHS[c][0] == 0:
+                    flag = True
+
+    print "KONCOWO", _PATHS
+    # for key in _PATHS:
+    #     _PATHS[key] = [org_cities_tuples.index(_PATHS[key])]
         #time.sleep(1)
-    print _PATHS
-    k = 0
-    j = 0
-    for key in _PATHS:
-        if k == 0:
-            k += 1
-            continue
-        else:
-            temp_val = None
-            for key2 in _PATHS:
-                if key2 == key:
-                    break
-                temp_val = _PATHS[key2]
-            if temp_val:
-                #_PATHS[key].append(temp_val)
-
-                for ii in temp_val:
-
-                    _PATHS[key].append(ii)
-                _PATHS[key].append(_PATHS[key].pop(0))
-            #         print "TEST", temp_val
-            #         _PATHS[key].append(ii)
-            #     print "TEST", temp_val
-            #     j += 1
-            #     if k == j:
-            #         break
-            # if len(temp_val) > 0 and len(temp_val) < 10:
-            #     for ii in temp_val:
-            #         print "TEST", temp_val
-            #         _PATHS[key].append(ii)
-
-            #_PATHS[key].append(temp_val)
-    print _PATHS
+    # print _PATHS
+    # k = 0
+    # j = 0
+    # for key in _PATHS:
+    #     if k == 0:
+    #         k += 1
+    #         continue
+    #     else:
+    #         temp_val = None
+    #         for key2 in _PATHS:
+    #             if key2 == key:
+    #                 break
+    #             temp_val = _PATHS[key2]
+    #         if temp_val:
+    #             #_PATHS[key].append(temp_val)
+    #
+    #             for ii in temp_val:
+    #
+    #                 _PATHS[key].append(ii)
+    #             _PATHS[key].append(_PATHS[key].pop(0))
+    #         #         print "TEST", temp_val
+    #         #         _PATHS[key].append(ii)
+    #         #     print "TEST", temp_val
+    #         #     j += 1
+    #         #     if k == j:
+    #         #         break
+    #         # if len(temp_val) > 0 and len(temp_val) < 10:
+    #         #     for ii in temp_val:
+    #         #         print "TEST", temp_val
+    #         #         _PATHS[key].append(ii)
+    #
+    #         #_PATHS[key].append(temp_val)
+    # print _PATHS
+    # print prev_cities
     time.sleep(30)
 
 
@@ -361,7 +381,6 @@ neighbour_tab= [[1,0,1,1], [0,1,1,0],[1,1,1,1],[1,0,0,1]]
 # dest_cities =[[82, 26], [53, 2], [87, 51], [54, 70], [3, 37]]
 cities = [[82, 26], [53, 2], [87,51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]] # 10 miast
 orgine_cities = cities[:]
-
 cities_no = len(cities)
 
 # ----------------------------------------------------
