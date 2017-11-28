@@ -44,12 +44,14 @@ def draw_chart(path, added_gasStation, duration=0.5):
             id = cities.index(k)
             ids_tab.append(id)
     print "ids tab ", ids_tab
-
+    print "path ", path
     labels_gasStation = ['GS_{}'.format(i + 1) for i in range(len(gas_station))]
     labels = ['M_{}'.format(i) for i in ids_tab]
     label1 = ['D_{}'.format(i) for i in xrange(len(designated_cities))]
+
     plt.plot(*zip(*path), marker='x')  # * - skrot do przekazywania wielu zmiennym ktore sa zapakowane w np listach lub krotkach najpierw pierwszy element, pozniej drugi element listy  i tak dalej, tak jak bym przekazywala osobne zmienne, * rozbicie pojemnika
     plt.plot(*zip(*gas_station), marker='o', linestyle=' ')
+    plt.plot(*zip(*cities), marker='o', linestyle=' ')
     i = 0
     for cor in path_copy:
         i += 1
@@ -109,34 +111,23 @@ def add_gasStation(new_tour, city1, city2, gasStations_dict, MAIN_PATH):
     tank = 200
     return new_tour, tank, gasStations_dict
 
-
-def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
-    # TODO liczenie dystansow tylko dla wybranych polaczen
-    tank = 180
-    tank_treshold = 120
-    count_sum = True
-    new_tour = 0
-
-    cities1 = cities[:]
-    gasStations_dict = {}
-    MAIN_PATH = []
-    route = []
+def define_edges():
+    edges = []
     for d  in xrange(len(designated_cities)):
         if d == len(designated_cities)-1:
-            temp_path = designated_cities[-1], designated_cities[0]
+             temp_path = designated_cities[-1], designated_cities[0]
         else:
             temp_path = designated_cities[d], designated_cities[d+1]
-        route.append(temp_path)
-        # print route
-    y = 1
+        edges.append(temp_path)
+    # print "route\n" ,route
+    return edges
 
 
-    for h in route:
+def create_coordinates_main_path(edges,MAIN_PATH, PATHS_DICT):
+    for h in edges:
         # print "h0 ",h[0], "node startoey", PATHS_DICT[h[0]]
         # print "h1 node docelowy",h[1], "sciazka do tego noda", PATHS_DICT[h[0]][h[1]]
-
         MAIN_PATH.append(PATHS_DICT[h[0]][h[1]])
-        # time.sleep(30)
     MAIN_PATH.append(designated_cities[0])
 
     temp_main_path = []
@@ -152,10 +143,27 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
     for id in MAIN_PATH:
         COR_MAIN_PATH.append(ref_cities[id])
 
+    return COR_MAIN_PATH, MAIN_PATH
+
     # print MAIN_PATH
     # print COR_MAIN_PATH
 
-    # time.sleep(30)
+
+def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
+
+    tank = 180
+    tank_treshold = 120
+    count_sum = True
+    new_tour = 0
+
+    cities1 = cities[:]
+    gasStations_dict = {}
+    MAIN_PATH = []
+    route = []
+
+
+    edges = define_edges()
+    COR_MAIN_PATH, MAIN_PATH = create_coordinates_main_path(edges, MAIN_PATH, PATHS_DICT)
 
 
     for i in range(len(MAIN_PATH)):
@@ -370,7 +378,7 @@ cities = [[80, 39], [11, 52], [78, 58], [45, 72]]
 cities = [[82, 26], [53, 2], [87, 51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]]  # 10 miast
 ref_cities = cities[:]
 # designated_cities = [(82, 26), (95, 56),(3, 37), (22, 56)]
-designated_cities = [0, 4, 1]
+designated_cities = [0, 4, 1, 6]
 # designated_cities = [7]
 original_cities = cities[:]
 cities_no = len(cities)
