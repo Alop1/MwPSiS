@@ -47,8 +47,8 @@ def draw_chart(path, added_gasStation, duration=0.5):
 
     labels_gasStation = ['GS_{}'.format(i + 1) for i in range(len(gas_station))]
     labels = ['M_{}'.format(i) for i in ids_tab]
-    plt.plot(*zip(*path),
-             marker='x')  # * - skrot do przekazywania wielu zmiennym ktore sa zapakowane w np listach lub krotkach najpierw pierwszy element, pozniej drugi element listy  i tak dalej, tak jak bym przekazywala osobne zmienne, * rozbicie pojemnika
+    label1 = ['D_{}'.format(i) for i in xrange(len(designated_cities))]
+    plt.plot(*zip(*path), marker='x')  # * - skrot do przekazywania wielu zmiennym ktore sa zapakowane w np listach lub krotkach najpierw pierwszy element, pozniej drugi element listy  i tak dalej, tak jak bym przekazywala osobne zmienne, * rozbicie pojemnika
     plt.plot(*zip(*gas_station), marker='o', linestyle=' ')
     i = 0
     for cor in path_copy:
@@ -56,8 +56,13 @@ def draw_chart(path, added_gasStation, duration=0.5):
         plt.annotate(labels[i - 1], xy=(cor[0], cor[1]), xytext=(2, 2), textcoords='offset points')
     i = 0
     for j in gas_station:
-        plt.annotate(labels_gasStation[i], xy=(j[0], j[1]), xytext=(2, 2), textcoords='offset points')
+        plt.annotate(labels_gasStation[i], xy=(j[0], j[1]), xytext=(10, 2), textcoords='offset points')
         i += 1
+    # i =0
+    # for j in designated_cities:
+    #     plt.annotate(label1[i], xy=(j[0], j[1]), xytext=(10, 2), textcoords='offset points')
+    #     i += 1
+
     plt.show(block=True)
     time.sleep(duration)
     plt.close()
@@ -322,11 +327,7 @@ def main():
     while (temperature > 10):
         checkPoint += 1  # sprawdza iteracje petli
         dis = []
-
         swap()
-        # TODO akceptacja trasy ktora spelnia wymaganai tablicy sasiedztw
-        # random.shuffle(cities)          #ustatwie nowa, calkowicie losowa trase
-
         count_sum, zlamane_iteracje, new_tour, stations, COR_MAIN_PATH = count_distance(tour, zlamane_iteracje, dis, PATHS_DICT)
         # if przypisujacy najlepsze rozwiazania do finalnych zmiennych
         if count_sum:
@@ -368,7 +369,6 @@ cities = [[80, 39], [11, 52], [78, 58], [45, 72]]
 # dest_cities =[[82, 26], [53, 2], [87, 51], [54, 70], [3, 37]]
 cities = [[82, 26], [53, 2], [87, 51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]]  # 10 miast
 ref_cities = cities[:]
-# 0, 4, 7, 8
 # designated_cities = [(82, 26), (95, 56),(3, 37), (22, 56)]
 designated_cities = [0, 4, 1]
 # designated_cities = [7]
