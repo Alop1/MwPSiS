@@ -310,7 +310,9 @@ def modified_dijkstra():
             print "nieodwiedzone miasta", not_checked_cities
 
             main_temp_checked_cities = temp1_checked_cities[:]
+
         PATHS = create_route_table(PATHS, org_cities_tuples, node)
+
         PATHS_DICT[node] = PATHS
     print  PATHS_DICT
     # time.sleep(30)
@@ -378,7 +380,7 @@ cities = [[80, 39], [11, 52], [78, 58], [45, 72]]
 cities = [[82, 26], [53, 2], [87, 51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]]  # 10 miast
 ref_cities = cities[:]
 # designated_cities = [(82, 26), (95, 56),(3, 37), (22, 56)]
-designated_cities = [0, 4, 1, 6]
+designated_cities = [0, 3 ,5, 1, 6]
 # designated_cities = [7]
 original_cities = cities[:]
 cities_no = len(cities)
