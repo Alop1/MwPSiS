@@ -37,9 +37,16 @@ def draw_chart(path, added_gasStation, duration=0.5):
         value = added_gasStation[k]
         value = list(value)
         path.insert(k, value)
-    path.append(path[0])
+    # path.append(path[0])
+    ids_tab =[]
+    for k in path_copy:
+        if k in cities:
+            id = cities.index(k)
+            ids_tab.append(id)
+    print "ids tab ", ids_tab
+
     labels_gasStation = ['GS_{}'.format(i + 1) for i in range(len(gas_station))]
-    labels = ['M_{}'.format(i + 1) for i in range(len(path) - 1)]
+    labels = ['M_{}'.format(i) for i in ids_tab]
     plt.plot(*zip(*path),
              marker='x')  # * - skrot do przekazywania wielu zmiennym ktore sa zapakowane w np listach lub krotkach najpierw pierwszy element, pozniej drugi element listy  i tak dalej, tak jak bym przekazywala osobne zmienne, * rozbicie pojemnika
     plt.plot(*zip(*gas_station), marker='o', linestyle=' ')
@@ -57,23 +64,23 @@ def draw_chart(path, added_gasStation, duration=0.5):
 
 
 def swap():
-    swap_tab = range(len(cities))
+    swap_tab = range(len(designated_cities))
     del swap_tab[0]
     city1_id = random.choice(swap_tab)
     swap_tab.remove(city1_id)
     city2_id = random.choice(swap_tab)
     swap_tab.remove(city2_id)
 
-    temp = cities[city1_id]
-    cities[city1_id] = cities[city2_id]
-    cities[city2_id] = temp
+    temp = designated_cities[city1_id]
+    designated_cities[city1_id] = designated_cities[city2_id]
+    designated_cities[city2_id] = temp
     # TODO check_swap - funkcja sprawdzajaca czy cities po swapie sa mozliwe
 
 
-def add_gasStation(new_tour, city1, city2, gasStations_dict):
+def add_gasStation(new_tour, city1, city2, gasStations_dict, MAIN_PATH):
     global cities
     global gas_station
-    cities_working_backup = cities[:]
+    cities_working_backup = MAIN_PATH[:]
     # print "find the nearest gas station"
     distances_to_gas_stations = []
     # print "stations paliw -> ", gas_station
@@ -104,8 +111,7 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
     tank_treshold = 120
     count_sum = True
     new_tour = 0
-    # print "count distance cities ", cities
-    # print PATHS_DICT
+
     cities1 = cities[:]
     gasStations_dict = {}
     MAIN_PATH = []
@@ -116,25 +122,44 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
         else:
             temp_path = designated_cities[d], designated_cities[d+1]
         route.append(temp_path)
+        # print route
+    y = 1
+
+
     for h in route:
-        print h[0], h[1]
-        print "TEST--", PATHS_DICT[h[0]][h[1]]
+        # print "h0 ",h[0], "node startoey", PATHS_DICT[h[0]]
+        # print "h1 node docelowy",h[1], "sciazka do tego noda", PATHS_DICT[h[0]][h[1]]
+
         MAIN_PATH.append(PATHS_DICT[h[0]][h[1]])
-        MAIN_PATH.append(h[1])
-    print MAIN_PATH
-    time.sleep(30)
-    # print "reoue ", route
+        # time.sleep(30)
+    MAIN_PATH.append(designated_cities[0])
+
+    temp_main_path = []
+    for element in MAIN_PATH:
+        if isinstance(element, list):
+            for e in element:
+                temp_main_path.append(e)
+        else:
+             temp_main_path.append(element)
+
+    MAIN_PATH = temp_main_path
+    COR_MAIN_PATH = []
+    for id in MAIN_PATH:
+        COR_MAIN_PATH.append(ref_cities[id])
+
+    # print MAIN_PATH
+    # print COR_MAIN_PATH
+
+    # time.sleep(30)
 
 
-    for i in range(cities_no):
+    for i in range(len(MAIN_PATH)):
 
-        if i == cities_no - 1:
-            dis.append( round(math.sqrt((cities1[i][0] - cities1[0][0]) ** 2 + ((cities1[i][1] - cities1[0][1]) ** 2)), 2))
+        if i == len(MAIN_PATH) - 1:
+            dis.append(round(math.sqrt((COR_MAIN_PATH[i][0] - COR_MAIN_PATH[0][0]) ** 2 + ((COR_MAIN_PATH[i][1] - COR_MAIN_PATH[0][1]) ** 2)), 2))
             # print "trasa od city", i, "do city startowego"
         else:
-            dis.append(
-                round(math.sqrt((cities1[i][0] - cities1[i + 1][0]) ** 2 + ((cities1[i][1] - cities1[i + 1][1]) ** 2)),
-                      2))
+            dis.append( round(math.sqrt((COR_MAIN_PATH[i][0] - COR_MAIN_PATH[i + 1][0]) ** 2 + ((COR_MAIN_PATH[i][1] - COR_MAIN_PATH[i + 1][1]) ** 2)),2))
             # print "trasa od city", i, "do city ", i+1
         new_tour = new_tour + dis[i]
         tank = tank - dis[i] * 0.30  # zmienijszenie tank
@@ -145,7 +170,7 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
         if tank < tank_treshold:  # kiedy new_tour przekroczy tank
             # print "KONCZY SIE BENZYNA"
             try:
-                new_tour, tank, gasStations_dict = add_gasStation(new_tour, cities[i], cities[i + 1], gasStations_dict)
+                new_tour, tank, gasStations_dict = add_gasStation(new_tour, COR_MAIN_PATH[i], COR_MAIN_PATH[i + 1], gasStations_dict, COR_MAIN_PATH)
                 # print "koordynaty  gas stations - uzupelniony", gasStations_dict
             except Exception as e:
                 print e
@@ -156,7 +181,7 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
             # print "zlamana petal"
             break
 
-    return count_sum, zlamane_iteracje, new_tour, gasStations_dict
+    return count_sum, zlamane_iteracje, new_tour, gasStations_dict, COR_MAIN_PATH
 
 
 def create_route_table(PATHS, org_cities_tuples, node):
@@ -302,14 +327,14 @@ def main():
         # TODO akceptacja trasy ktora spelnia wymaganai tablicy sasiedztw
         # random.shuffle(cities)          #ustatwie nowa, calkowicie losowa trase
 
-        count_sum, zlamane_iteracje, new_tour, stations = count_distance(tour, zlamane_iteracje, dis, PATHS_DICT)
+        count_sum, zlamane_iteracje, new_tour, stations, COR_MAIN_PATH = count_distance(tour, zlamane_iteracje, dis, PATHS_DICT)
         # if przypisujacy najlepsze rozwiazania do finalnych zmiennych
         if count_sum:
             sum_dis = sum(dis)
             # print sum_dis
             # if math.exp((tour - sum_dis)/temperature ) > (random.randint(0,100)*5) or sum_dis < tour :
             tour = new_tour
-            best_cities = cities[:]
+            best_cities = COR_MAIN_PATH[:]
             best_stations = dict(stations)  # skopiuj stations
             # print "best cities  to ", cities, "+ stacje  benzymnowe ", best_stations
             # print "\n\n"
@@ -324,6 +349,7 @@ def main():
     print "CZAS ", datetime.now() - startTime
     # koncowa trasa
     print "best cities  to ", best_cities, "+ stacje benzynowe", best_stations
+    print COR_MAIN_PATH
     draw_chart(best_cities, best_stations, 7)
 
 
@@ -341,9 +367,10 @@ cities = [[80, 39], [11, 52], [78, 58], [45, 72]]
 
 # dest_cities =[[82, 26], [53, 2], [87, 51], [54, 70], [3, 37]]
 cities = [[82, 26], [53, 2], [87, 51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]]  # 10 miast
+ref_cities = cities[:]
 # 0, 4, 7, 8
 # designated_cities = [(82, 26), (95, 56),(3, 37), (22, 56)]
-designated_cities = [0, 4, 7, 8]
+designated_cities = [0, 4, 1]
 # designated_cities = [7]
 original_cities = cities[:]
 cities_no = len(cities)
