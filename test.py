@@ -144,11 +144,9 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
     tank_treshold = 120
     count_sum = True
     new_tour = 0
-
-    cities1 = cities[:]
     gasStations_dict = {}
     MAIN_PATH = []
-    route = []
+
 
     edges = define_edges()
     COR_MAIN_PATH, MAIN_PATH = create_coordinates_main_path(edges, MAIN_PATH, PATHS_DICT)
