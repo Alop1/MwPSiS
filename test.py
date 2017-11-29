@@ -14,23 +14,22 @@ import collections
 #                print "koordynaty  gas stations - uzupelniony", gasStations_dict
 #            except Exception as e:
 #                print e
-# TODO zrobic inteligentniejszego swap-a - to jest trudniejsze zadanie
+
 
 # ALGORYTM
 # 1. Ustaw tablice  najkrotszych sciezek pomiedzy miastami z przesylka, po drodze uwzglednij trasy przez mista bez przesylki
-# 1. Ustaw calkiem losowa kolejnosc odwiedzania mista z przesylkami -> tasae wyznaczana jest na podstawie kolejnosc tablicy cities
+# 2. Ustaw calkiem losowa kolejnosc odwiedzania mista z przesylkami
 # 3. Najkrotsza trase pomiedzy wczesniej wylosowanymi nodami n, a n+1 wez z tablicy najkrotszych sciezek
-# 3. licz trase po koleji z wezla n do wezla n+1, gdy bak przekroczy tank treshold, dodaj dystans z obecnego city->najblizszej stacji i z stacji->next hopa, zapisz wspolzedne wybranej stacji do gasStations_dict
-# 4. jezeli trasa jest krotsza od ostatnie najlepszej, ustaw ja jako najbardziej optymalna razem z wpisanymi dla tej trasy stacjami
-# 5. zrob swapa na dwoch losowych wezlach misat z przesylka
-# 6. przejdz do 3, jezeli temperatura powyzej tresholdu
+# 4. Licz trase po koleji z wezla i do wezla i+1, gdy bak przekroczy tank treshold, dodaj dystans z obecnego city->najblizszej stacji i z stacji->next hopa, zapisz wspolzedne wybranej stacji do gasStations_dict
+# 5. Jezeli trasa jest krotsza od ostatnie najlepszej, ustaw ja jako najbardziej optymalna razem z wpisanymi dla tej trasy stacjami
+# 6. Zrob swapa na dwoch losowych wezlach misat z przesylka
+# 7. Przejdz do 3, jezeli temperatura powyzej tresholdu
 
 startTime = datetime.now()
 
 
 def draw_chart(path, added_gasStation, duration=0.5):
     global gas_station
-    # added_gasStation = {78:(6,7), 8:(78,93)}
     sorted_ids = sorted(added_gasStation.keys())
     path_copy = path[:]
     for k in sorted_ids[::-1]:
@@ -46,8 +45,7 @@ def draw_chart(path, added_gasStation, duration=0.5):
     print "ids tab ", ids_tab
     print "path ", path
     labels_gasStation = ['GS_{}'.format(i + 1) for i in range(len(gas_station))]
-    labels = ['M_{}'.format(i) for i in ids_tab]
-    label1 = ['D_{}'.format(i) for i in xrange(len(designated_cities))]
+    labels = ['C_{}'.format(i) for i in ids_tab]
 
     plt.plot(*zip(*path), marker='x')  # * - skrot do przekazywania wielu zmiennym ktore sa zapakowane w np listach lub krotkach najpierw pierwszy element, pozniej drugi element listy  i tak dalej, tak jak bym przekazywala osobne zmienne, * rozbicie pojemnika
     plt.plot(*zip(*gas_station), marker='o', linestyle=' ')
@@ -58,12 +56,8 @@ def draw_chart(path, added_gasStation, duration=0.5):
         plt.annotate(labels[i - 1], xy=(cor[0], cor[1]), xytext=(2, 2), textcoords='offset points')
     i = 0
     for j in gas_station:
-        plt.annotate(labels_gasStation[i], xy=(j[0], j[1]), xytext=(10, 2), textcoords='offset points')
+        plt.annotate(labels_gasStation[i], xy=(j[0], j[1]), xytext=(2, 2), textcoords='offset points')
         i += 1
-    # i =0
-    # for j in designated_cities:
-    #     plt.annotate(label1[i], xy=(j[0], j[1]), xytext=(10, 2), textcoords='offset points')
-    #     i += 1
 
     plt.show(block=True)
     time.sleep(duration)
@@ -81,7 +75,7 @@ def swap():
     temp = designated_cities[city1_id]
     designated_cities[city1_id] = designated_cities[city2_id]
     designated_cities[city2_id] = temp
-    # TODO check_swap - funkcja sprawdzajaca czy cities po swapie sa mozliwe
+
 
 
 def add_gasStation(new_tour, city1, city2, gasStations_dict, MAIN_PATH):
@@ -125,8 +119,6 @@ def define_edges():
 
 def create_coordinates_main_path(edges,MAIN_PATH, PATHS_DICT):
     for h in edges:
-        # print "h0 ",h[0], "node startoey", PATHS_DICT[h[0]]
-        # print "h1 node docelowy",h[1], "sciazka do tego noda", PATHS_DICT[h[0]][h[1]]
         MAIN_PATH.append(PATHS_DICT[h[0]][h[1]])
     MAIN_PATH.append(designated_cities[0])
 
@@ -145,9 +137,6 @@ def create_coordinates_main_path(edges,MAIN_PATH, PATHS_DICT):
 
     return COR_MAIN_PATH, MAIN_PATH
 
-    # print MAIN_PATH
-    # print COR_MAIN_PATH
-
 
 def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
 
@@ -161,10 +150,8 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
     MAIN_PATH = []
     route = []
 
-
     edges = define_edges()
     COR_MAIN_PATH, MAIN_PATH = create_coordinates_main_path(edges, MAIN_PATH, PATHS_DICT)
-
 
     for i in range(len(MAIN_PATH)):
 
@@ -201,7 +188,7 @@ def create_route_table(PATHS, org_cities_tuples, node):
     for key in PATHS:
          PATHS[key] = [org_cities_tuples.index(PATHS[key])]
 
-    print "POCZATKOWO WSZYSTKIE", PATHS
+    # print "POCZATKOWO WSZYSTKIE", PATHS
     flag = True
     while flag:
         flag = False
@@ -209,7 +196,6 @@ def create_route_table(PATHS, org_cities_tuples, node):
             c = PATHS[i][0]
             # print "POPRZEDNIE MIASTO", c
             if c != node:
-                # print "JEDZIEM"
                 PATHS[i] = PATHS[c] + PATHS[i]
                 if PATHS[c][0] == node:
                     flag = True
@@ -272,9 +258,6 @@ def modified_dijkstra():
                 main_temp_checked_cities = temp1_checked_cities
                 k = 1
                 # time.sleep(5)
-            # print "SCIEZKA !!!!", PATHS
-
-
 
             temp1_checked_cities = []
             print "\nprzeszukujemy zbior z iteracji: ", temp_checked_cities
@@ -319,8 +302,6 @@ def modified_dijkstra():
     return PATHS_DICT
 
 
-    # time.sleep(30)
-
 
 def main():
     # zmienne do stystyk
@@ -341,7 +322,6 @@ def main():
         count_sum, zlamane_iteracje, new_tour, stations, COR_MAIN_PATH = count_distance(tour, zlamane_iteracje, dis, PATHS_DICT)
         # if przypisujacy najlepsze rozwiazania do finalnych zmiennych
         if count_sum:
-            sum_dis = sum(dis)
             # print sum_dis
             # if math.exp((tour - sum_dis)/temperature ) > (random.randint(0,100)*5) or sum_dis < tour :
             tour = new_tour
@@ -374,14 +354,10 @@ main_temp_checked_cities = []
 # --------------------------------------------------------
 cities = [[80, 39], [11, 52], [78, 58], [45, 72]]
 # cities = [[16, 50], [62, 91],  [43, 8], [11, 71], [34, 31],[23,89],[76,42],[76,90]] #8
-
-
 # dest_cities =[[82, 26], [53, 2], [87, 51], [54, 70], [3, 37]]
 cities = [[82, 26], [53, 2], [87, 51], [54, 70], [3, 37], [28, 33], [95, 56], [24, 69], [22, 56], [47, 26]]  # 10 miast
 ref_cities = cities[:]
-# designated_cities = [(82, 26), (95, 56),(3, 37), (22, 56)]
-designated_cities = [0, 3 ,5, 1, 6]
-# designated_cities = [7]
+designated_cities = [0, 3, 5, 1, 6]
 original_cities = cities[:]
 cities_no = len(cities)
 
