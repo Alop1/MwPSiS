@@ -1,4 +1,7 @@
 import datetime
+import re
+import requests
+from bs4 import BeautifulSoup
 
 # referal link http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/01.10.2017
 #              http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017
@@ -22,23 +25,35 @@ def get_link(start_date, end_date):
         date = tem_date[::-1]
         date = ".".join(date)
         # date = date.replace("-", ".")
-        link_tabs.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/"+date)
+        links_tab.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/"+date)
 
     print links_tab
     return links_tab
 
+def click_button(links_tab):
+    pass
+    ## https://stackoverflow.com/questions/33538600/how-to-automatically-download-the-files-that-have-a-download-button-on-a-webpage
+    ## https://stackoverflow.com/questions/11588072/handle-a-file-download-triggered-by-the-click-of-a-button
+    ##
+    my_folder = 'D:\userdata\lacz\Desktop\temp'
+
+    from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+
+    profile = FirefoxProfile ()
+    profile.set_preference("browser.download.folderList",2)
+    profile.set_preference("browser.download.manager.showWhenStarting",False)
+    profile.set_preference("browser.download.dir", my_folder)
+    profile.set_preference("browser.helperApps.neverAsk.saveToDisk",'application/pdf')
+    driver = webdriver.Firefox(firefox_profile=profile)
+    driver.get(URL)
+    submit3 = driver.find_element_by_id("linkResumeTitle")
+    submit3.click()
+
 
 def main():
 
-    # dateList = []
-    # numdays = 100
-    # base = datetime.datetime.today()
-    # date_list = [base - datetime.timedelta(days=x) for x in range(0, numdays)]
-    # print "daty", date_list[0]
-    # single_date = date_list[0]
-    # print single_date
-
     links_tab = get_link(start_date= "21.06.2017",end_date = "07.07.2017")
+    click_button(links_tab)
 
 
 
