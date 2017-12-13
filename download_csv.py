@@ -13,7 +13,7 @@ from selenium import webdriver
 
 # TODO wygenerowac tablice linkow dla kazdej stacji {staca : [tablica linkow]} done
 # TODO dostac sie do  strony i kliknac export to csv - done
-# TODO obsluzyc zapis
+# TODO obsluzyc zapis - semi dane
 
 def get_link(start_date, end_date, PM10 = [], PM25= [] ):
     ##46-1747-1921-1914-1752-148-1723-57 - stacje PM10 KRakow
@@ -57,7 +57,7 @@ def click_button(links_tab):
     ## https://stackoverflow.com/questions/33538600/how-to-automatically-download-the-files-that-have-a-download-button-on-a-webpage
     ## https://stackoverflow.com/questions/11588072/handle-a-file-download-triggered-by-the-click-of-a-button
     ##
-    my_folder = 'D:\userdata\lacz\Desktop\temp'
+    my_folder = 'D:\userdata\lacz\Desktop\temp'  # wybrac folder !!!!!
 
 
     URL = "http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017"
@@ -66,8 +66,8 @@ def click_button(links_tab):
     profile.set_preference("browser.download.manager.showWhenStarting",False)
     profile.set_preference("browser.download.dir", my_folder)
     profile.set_preference("browser.helperApps.neverAsk.saveToDisk",'text/csv')
-    profile.set_preference('network.proxy.type',2)
-    profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
+    # profile.set_preference('network.proxy.type',2)
+    # profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
     driver = webdriver.Firefox(firefox_profile=profile)
     for link in links_tab:
 
