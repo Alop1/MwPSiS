@@ -3,6 +3,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import string, os, math, time
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+from selenium import webdriver
 
 
 # referal link http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/01.10.2017
@@ -10,10 +12,25 @@ import string, os, math, time
 
 
 # TODO wygenerowac tablice linkow dla kazdej stacji {staca : [tablica linkow]} done
-# TODO dostac sie do  strony i kliknac export to csv
+# TODO dostac sie do  strony i kliknac export to csv - done
 # TODO obsluzyc zapis
 
-def get_link(start_date, end_date):
+def get_link(start_date, end_date, PM10 = [], PM25= [] ):
+    ##46-1747-1921-1914-1752-148-1723-57 - stacje PM10 KRakow
+    ##..parametr/pm2.5/stacje/202-242-211-1911/.../10.2017 -  stacje PM2.5 krakow
+    print "PM10 -> ", PM10
+    print "PM25 -> ", PM25
+
+    dusts = (PM10 if PM10 else PM25)
+
+    print dusts
+
+
+
+
+
+
+
 
     start = datetime.datetime.strptime(start_date, "%d.%m.%Y")
     end = datetime.datetime.strptime(end_date, "%d.%m.%Y")
@@ -27,7 +44,10 @@ def get_link(start_date, end_date):
         date = tem_date[::-1]
         date = ".".join(date)
         # date = date.replace("-", ".")
-        links_tab.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/"+date)
+        if PM10:
+            links_tab.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/"+PM10+"/dzienny/"+date)
+        else:
+            links_tab.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm2.5/stacje/"+PM25+"/dzienny/"+date)
 
     print links_tab
     return links_tab
@@ -39,31 +59,33 @@ def click_button(links_tab):
     ##
     my_folder = 'D:\userdata\lacz\Desktop\temp'
 
-    from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-    from selenium import webdriver
+
     URL = "http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017"
     profile = FirefoxProfile ()
     profile.set_preference("browser.download.folderList",2)
     profile.set_preference("browser.download.manager.showWhenStarting",False)
     profile.set_preference("browser.download.dir", my_folder)
-    profile.set_preference("browser.helperApps.neverAsk.saveToDisk",'application/pdf')
+    profile.set_preference("browser.helperApps.neverAsk.saveToDisk",'text/csv')
     profile.set_preference('network.proxy.type',2)
     profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
     driver = webdriver.Firefox(firefox_profile=profile)
-    driver.get(URL)
-    submit3 = driver.find_element_by_id("table-export-to-csv")
-    time.sleep(5)
-    submit3.click()
+    for link in links_tab:
+
+        driver.get(link)
+        submit3 = driver.find_element_by_id("table-export-to-csv")
+        time.sleep(2)
+        submit3.click()
 
 
 def main():
+    PM10_stations = "46-1747-1921-1914-1752-148-1723-57"
+    PM25_stations = "202-242-211-1911"
 
-    links_tab = get_link(start_date= "21.06.2017",end_date = "07.07.2017")
+    links_tab = get_link(start_date="21.06.2017", end_date="07.07.2017", PM10=PM10_stations)
+    links_tab = get_link(start_date="21.06.2017", end_date="07.07.2017", PM25=PM25_stations)
+
+
     click_button(links_tab)
-
-
-
-
 
 
 
