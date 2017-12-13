@@ -2,6 +2,8 @@ import datetime
 import re
 import requests
 from bs4 import BeautifulSoup
+import string, os, math, time
+
 
 # referal link http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/01.10.2017
 #              http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017
@@ -38,15 +40,19 @@ def click_button(links_tab):
     my_folder = 'D:\userdata\lacz\Desktop\temp'
 
     from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-
+    from selenium import webdriver
+    URL = "http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017"
     profile = FirefoxProfile ()
     profile.set_preference("browser.download.folderList",2)
     profile.set_preference("browser.download.manager.showWhenStarting",False)
     profile.set_preference("browser.download.dir", my_folder)
     profile.set_preference("browser.helperApps.neverAsk.saveToDisk",'application/pdf')
+    profile.set_preference('network.proxy.type',2)
+    profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
     driver = webdriver.Firefox(firefox_profile=profile)
     driver.get(URL)
-    submit3 = driver.find_element_by_id("linkResumeTitle")
+    submit3 = driver.find_element_by_id("table-export-to-csv")
+    time.sleep(5)
     submit3.click()
 
 
