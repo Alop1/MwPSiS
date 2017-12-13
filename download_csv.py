@@ -15,7 +15,7 @@ from selenium import webdriver
 # TODO dostac sie do  strony i kliknac export to csv - done
 # TODO obsluzyc zapis - semi dane
 
-def get_link(start_date, end_date, PM10 = [], PM25= [] ):
+def get_link(start_date, end_date, PM10='', PM25='' ):
     ##46-1747-1921-1914-1752-148-1723-57 - stacje PM10 KRakow
     ##..parametr/pm2.5/stacje/202-242-211-1911/.../10.2017 -  stacje PM2.5 krakow
     print "PM10 -> ", PM10
@@ -54,7 +54,7 @@ def click_button(links_tab):
 
 
     URL = "http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017"
-    profile = FirefoxProfile ()
+    profile = FirefoxProfile()
     profile.set_preference("browser.download.folderList",2)
     profile.set_preference("browser.download.manager.showWhenStarting",False)
     profile.set_preference("browser.download.dir", my_folder)
@@ -74,11 +74,11 @@ def main():
     PM10_stations = "46-1747-1921-1914-1752-148-1723-57"
     PM25_stations = "202-242-211-1911"
 
-    links_tab = get_link(start_date="21.06.2017", end_date="07.07.2017", PM10=PM10_stations)
-    links_tab = get_link(start_date="21.06.2017", end_date="07.07.2017", PM25=PM25_stations)
+    links_tab = get_link(start_date="21.06.2016", end_date="07.07.2017", PM10=PM10_stations)
+    # links_tab = get_link(start_date="21.06.2017", end_date="07.07.2017", PM25=PM25_stations)
 
 
-    click_button(links_tab)
+    # click_button(links_tab)
 
 
 
