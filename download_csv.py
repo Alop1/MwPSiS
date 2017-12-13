@@ -22,14 +22,7 @@ def get_link(start_date, end_date, PM10 = [], PM25= [] ):
     print "PM25 -> ", PM25
 
     dusts = (PM10 if PM10 else PM25)
-
     print dusts
-
-
-
-
-
-
 
 
     start = datetime.datetime.strptime(start_date, "%d.%m.%Y")
