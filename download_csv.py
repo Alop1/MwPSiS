@@ -1,7 +1,4 @@
 import datetime
-import re
-import requests
-from bs4 import BeautifulSoup
 import string, os, math, time
 from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from selenium import webdriver
@@ -13,9 +10,9 @@ import glob
 #              http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017
 
 
-# TODO wygenerowac tablice linkow dla kazdej stacji {staca : [tablica linkow]} done
+# TODO wygenerowac tablice linkow dla PM10 PM2.5 done
 # TODO dostac sie do  strony i kliknac export to csv - done
-# TODO obsluzyc zapis - semi dane
+# TODO obsluzyc zapis - dane
 
 def get_link(start_date, end_date, PM10='', PM25='' ):
     ##46-1747-1921-1914-1752-148-1723-57 - stacje PM10 KRakow
@@ -23,8 +20,9 @@ def get_link(start_date, end_date, PM10='', PM25='' ):
     print "PM10 -> ", PM10
     print "PM25 -> ", PM25
 
-    dusts = (PM10 if PM10 else PM25)
-    print dusts
+
+    ## dusts = (PM10 if PM10 else PM25)
+    ## print dusts
 
 
     start = datetime.datetime.strptime(start_date, "%d.%m.%Y")
@@ -38,7 +36,6 @@ def get_link(start_date, end_date, PM10='', PM25='' ):
         tem_date = date.split("-")
         date = tem_date[::-1]
         date = ".".join(date)
-        # date = date.replace("-", ".")
         if PM10:
             links_tab.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/"+PM10+"/dzienny/"+date)
         else:
@@ -53,9 +50,6 @@ def click_button(links_tab):
     ## https://stackoverflow.com/questions/11588072/handle-a-file-download-triggered-by-the-click-of-a-button
     ##
     my_folder = 'D:\userdata\lacz\Desktop\\temp\WIOS\\'  # wybrac folder !!!!!
-    print my_folder
-
-
     URL = "http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017"
     profile = FirefoxProfile()
     profile.set_preference("browser.download.folderList",2)
@@ -65,8 +59,8 @@ def click_button(links_tab):
     profile.set_preference('network.proxy.type',2)
     profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
     driver = webdriver.Firefox(firefox_profile=profile)
-    for link in links_tab:
 
+    for link in links_tab:
         driver.get(link)
         submit3 = driver.find_element_by_id("table-export-to-csv")
         time.sleep(2)
@@ -78,15 +72,11 @@ def click_button(links_tab):
 def assign_name(my_folder, link):
     date = link[-10:]
     date = date.replace(".", "-")
-    print date
     date = date + ".csv"
     date = str(date)
-    print date
     os.chdir(my_folder)
     files = glob.glob('*.csv')
-    print files
     latest_file = max(files, key=os.path.getctime)
-    print latest_file
     os.rename(latest_file, date)
 
 
@@ -98,11 +88,7 @@ def main():
 
     # links_tab = get_link(start_date="21.06.2016", end_date="07.07.2017", PM10=PM10_stations)
     links_tab = get_link(start_date="22.06.2017", end_date="07.07.2017", PM25=PM25_stations)
-
-
     click_button(links_tab)
-
-
 
 
 if __name__ == "__main__":
