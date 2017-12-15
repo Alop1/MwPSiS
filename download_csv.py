@@ -10,7 +10,7 @@ import glob
 #              http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017
 
 
-# TODO wygenerowac tablice linkow dla PM10 PM2.5 done
+# TODO wygenerowac tablice linkow dla PM10 PM2.5 - done
 # TODO dostac sie do  strony i kliknac export to csv - done
 # TODO obsluzyc zapis - dane
 
@@ -20,10 +20,8 @@ def get_link(start_date, end_date, PM10='', PM25='' ):
     print "PM10 -> ", PM10
     print "PM25 -> ", PM25
 
-
     ## dusts = (PM10 if PM10 else PM25)
     ## print dusts
-
 
     start = datetime.datetime.strptime(start_date, "%d.%m.%Y")
     end = datetime.datetime.strptime(end_date, "%d.%m.%Y")
@@ -73,7 +71,7 @@ def assign_name(my_folder, link):
     date = link[-10:]
     date = date.replace(".", "-")
     date = date + ".csv"
-    date = str(date)
+    # date = str(date)
     os.chdir(my_folder)
     files = glob.glob('*.csv')
     latest_file = max(files, key=os.path.getctime)
