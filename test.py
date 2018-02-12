@@ -141,7 +141,7 @@ def create_coordinates_main_path(edges,MAIN_PATH, PATHS_DICT):
 def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
 
     tank = 180
-    tank_treshold = 120
+    tank_treshold = 1
     count_sum = True
     new_tour = 0
     gasStations_dict = {}
@@ -183,6 +183,8 @@ def count_distance(tour, zlamane_iteracje, dis, PATHS_DICT):
 
 
 def create_route_table(PATHS, org_cities_tuples, node):
+
+    print "node ", node, "  ->  ", PATHS
     for key in PATHS:
          PATHS[key] = [org_cities_tuples.index(PATHS[key])]
 
@@ -197,6 +199,7 @@ def create_route_table(PATHS, org_cities_tuples, node):
                 PATHS[i] = PATHS[c] + PATHS[i]
                 if PATHS[c][0] == node:
                     flag = True
+
     print "KONCOWO", PATHS
     return PATHS
 

@@ -6,8 +6,10 @@ import os
 import glob
 
 
-# referal link http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/01.10.2017
-#              http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017
+
+
+
+
 
 
 # TODO wygenerowac tablice linkow dla PM10 PM2.5 - done
@@ -28,11 +30,9 @@ def get_link(start_date, end_date, PM10='', PM25='' ):
     date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end-start).days)]
     links_tab = []
     for date in date_generated:
-        date = str(date)
-        date = date.split(' ', 1)
-        date = date[0]
-        tem_date = date.split("-")
-        date = tem_date[::-1]
+        date = str(date).split(' ', 1)[0]
+        tmp_date = date.split("-")
+        date = tmp_date[::-1]
         date = ".".join(date)
         if PM10:
             links_tab.append("http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/"+PM10+"/dzienny/"+date)
@@ -44,26 +44,27 @@ def get_link(start_date, end_date, PM10='', PM25='' ):
 
 def click_button(links_tab):
     pass
-    ## https://stackoverflow.com/questions/33538600/how-to-automatically-download-the-files-that-have-a-download-button-on-a-webpage
-    ## https://stackoverflow.com/questions/11588072/handle-a-file-download-triggered-by-the-click-of-a-button
-    ##
-    my_folder = 'D:\userdata\lacz\Desktop\\temp\WIOS\\'  # wybrac folder !!!!!
+
+    my_folder = 'C:\Users\user\Desktop\ED_pyly\WIOS\\'     #'D:\userdata\lacz\Desktop\\temp\WIOS\\'  # wybrac folder !!!!!
     URL = "http://monitoring.krakow.pios.gov.pl/dane-pomiarowe/automatyczne/parametr/pm10/stacje/1723/dzienny/05.10.2017"
+    print "my folder ", my_folder
     profile = FirefoxProfile()
     profile.set_preference("browser.download.folderList",2)
     profile.set_preference("browser.download.manager.showWhenStarting",False)
     profile.set_preference("browser.download.dir", my_folder)
     profile.set_preference("browser.helperApps.neverAsk.saveToDisk",'text/csv')
-    profile.set_preference('network.proxy.type',2)
-    profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
+    # profile.set_preference('network.proxy.type',2)
+    # profile.set_preference('network.proxy.autoconfig_url', "http://proxyconf.glb.nsn-net.net/proxy.pac")
     driver = webdriver.Firefox(firefox_profile=profile)
+    time.sleep(5)
 
     for link in links_tab:
         driver.get(link)
-        submit3 = driver.find_element_by_id("table-export-to-csv")
-        time.sleep(2)
-        submit3.click()
         time.sleep(1)
+        submit3 = driver.find_element_by_id("table-export-to-csv")
+        time.sleep(3)
+        submit3.click()
+        time.sleep(2)
         assign_name(my_folder, link)
 
 
@@ -74,8 +75,12 @@ def assign_name(my_folder, link):
     # date = str(date)
     os.chdir(my_folder)
     files = glob.glob('*.csv')
-    latest_file = max(files, key=os.path.getctime)
+    try:
+        latest_file = max(files, key=os.path.getctime)
+    except Exception:
+        raise Exception("sprawdz sciezke do my_folder, upewnij sie czy zaakceptowales polityke cookies w otwartym oknie przegladarki, sprawdz czy sleepy sa odpowiednio dlugie ")
     os.rename(latest_file, date)
+    print "downloaded measurement from", date[:-4]
 
 
 
@@ -84,8 +89,8 @@ def main():
     PM10_stations = "46-1747-1921-1914-1752-148-1723-57"
     PM25_stations = "202-242-211-1911"
 
-    # links_tab = get_link(start_date="21.06.2016", end_date="07.07.2017", PM10=PM10_stations)
-    links_tab = get_link(start_date="22.06.2017", end_date="07.07.2017", PM25=PM25_stations)
+    links_tab = get_link(start_date="01.01.2016", end_date="15.12.2017", PM10=PM10_stations)
+    # links_tab = get_link(start_date="01.01.2016", end_date="15.12.2017", PM25=PM25_stations)
     click_button(links_tab)
 
 

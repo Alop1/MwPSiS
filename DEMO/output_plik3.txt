@@ -1,0 +1,33 @@
+C:/Users/user/Documents/GitHub/MwPSiS/DEMO/cut_frozen.mp4
+C:/Users/user/Documents/GitHub/MwPSiS/DEMO/Plik3.txt
+tyle znakow w wiadomosci 4200000
+C:/Users/user/Documents/GitHub/MwPSiS/DEMO/cut_frozen.mp4
+extract audio
+przed tempem
+mamy tempa C:\Users\user\Documents\GitHub\MwPSiS\DEMO
+C:\Users\user\Documents\GitHub\MwPSiS\DEMO\temp\extracted_audio.wav
+['ffmpeg', '-y', '-i', 'C:/Users/user/Documents/GitHub/MwPSiS/DEMO/cut_frozen.mp4', 'C:\\Users\\user\\Documents\\GitHub\\MwPSiS\\DEMO\\temp\\extracted_audio.wav', 'temp\\extracted_audio.wav', '-loglevel', 'quiet']
+frames!!! 534528
+no_of_frames 303.0
+vid_capacity 837734400
+audio capacity 1069056
+capacity 119829065
+message len 29400007
+capacity 838803456
+2138112
+extract audio
+mamy tempa C:\Users\user\Documents\GitHub\MwPSiS\DEMO
+C:\Users\user\Documents\GitHub\MwPSiS\DEMO\temp\extracted_audio.wav
+['ffmpeg', '-y', '-i', 'C:/Users/user/Documents/GitHub/MwPSiS/DEMO/cut_frozen.mp4', 'C:\\Users\\user\\Documents\\GitHub\\MwPSiS\\DEMO\\temp\\extracted_audio.wav', 'temp\\extracted_audio.wav', '-loglevel', 'quiet']
+Kodowanie w ramce nr 2
+Kodowanie w ramce nr 3
+Kodowanie w ramce nr 4
+Kodowanie w ramce nr 5
+Kodowanie w ramce nr 6
+Kodowanie w ramce nr 7
+Kodowanie w ramce nr 8
+Kodowanie w ramce nr 9
+Kodowanie w ramce nr 10
+Kodowanie w ramce nr 11
+zapisz video
+
